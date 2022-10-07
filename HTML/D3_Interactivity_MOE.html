@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="description" content="Data Visualisation" />
+		<meta name="keywords" content="HTML, CSS, D3" />
+		<meta name="author" content="Bernard Joshua" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" type="text/css" href="../CSS/style.css" />
+		<script src="//d3js.org/d3.v7.min.js"></script>
+
+		<title>Task 6.1 D3 Mouse Over Effects </title>
+	</head>
+	<body>
+		<h1>Mouse Over Effects with D3</h1>
+	<div>
+	<button class="btn_1"  id="btn_1"> Add </button>
+	<button class="btn_2"  id="btn_2"> Delete </button>
+	</div>
+
+
+	<script>
+
+	var w = 500;
+  	var h = 200;
+	var maxValue = 25;
+  	var dataset = [14,5,26,23,9,15,25,12,8,9,6,27,30];
+
+	var xScale = d3.scaleBand()
+				   .domain(d3.range(dataset.length))
+				   .rangeRound([0,w])
+				   .paddingInner(0.05);
+
+	var yScale = d3.scaleLinear()
+				   .domain([0, d3.max(dataset)])
+				   .range([0, h]);
+
+	var barPadding = 2;
+  	var svg = d3.select("body")
+              .append("svg")
+              .attr("width", w)
+              .attr("height", h);
+
+	svg.selectAll("rect")
+    .data(dataset)
+    .enter()
+    .append("rect")
+    .attr("x", function(d,i){return xScale(i);})
+    .attr("y", function(d){return h - yScale(d);})
+    .attr("width", xScale.bandwidth())
+    .attr("fill", "slategrey")
+    .attr("height", function(d){return yScale(d)})
+	.on("mouseover", function(event, d){
+		d3.select(this)
+		.attr("fill","orange")
+		var xPosition = parseFloat(d3.select(this).attr("x")) + 18
+		var yPosition = parseFloat(d3.select(this).attr("y")) + 18
+		svg.append("text")
+		.attr("id", "tooltip")
+		.attr("x", xPosition)
+		.attr("y", yPosition)
+		.attr("text-anchor", "middle")
+		.attr("font-family", "sans-serif")
+		.attr("font-size", "11px")
+		.attr("font-weight", "bold")
+		.attr("fill", "black")
+		.text(d);
+	})
+	.on("mouseout", function(){
+		d3.select(this)
+		.transition().duration(200)
+		.attr("fill","slategrey")
+		d3.select("#tooltip").remove();
+	});
+
+		//On click, update with new data
+	d3.select("#btn_1")
+		.on("click", function() {
+			var newNumber = Math.floor(Math.random()*maxValue);
+			dataset.push(newNumber);
+			xScale.domain(d3.range(dataset.length));
+			var bars = svg.selectAll("rect")
+				 	      .data(dataset)
+			bars.enter()
+				.append("rect")
+				.attr("x",w)
+				.attr("y",function(d) {
+					return h - yScale(d);
+				})
+				.merge(bars)
+				.transition()
+				.duration(500)
+				.attr("x", function(d,i) {return xScale(i) })
+				.attr("y", function(d) {return h - yScale(d); })
+				.attr("width", xScale.bandwidth())
+				.attr("height", function(d) {
+					return yScale(d);
+				})
+   				.attr("fill", "slategrey")
+				d3.selectAll("rect")
+					.on("mouseover", function(event, d){
+					d3.select(this)
+					.attr("fill","orange")
+					var xPosition = parseFloat(d3.select(this).attr("x")) + 18
+					var yPosition = parseFloat(d3.select(this).attr("y")) + 18
+					svg.append("text")
+					.attr("id", "tooltip")
+					.attr("x", xPosition)
+					.attr("y", yPosition)
+					.attr("text-anchor", "middle")
+					.attr("font-family", "sans-serif")
+					.attr("font-size", "11px")
+					.attr("font-weight", "bold")
+					.attr("fill", "black")
+					.text(d);
+					})
+					.on("mouseout", function(){
+					d3.select(this)
+					.transition().duration(200)
+					.attr("fill","slategrey")
+					d3.select("#tooltip").remove();
+				});
+			});
+	
+	d3.select("#btn_2")
+		.on("click", function() {
+				dataset.shift();
+				var bars = svg.selectAll("rect")
+				.data(dataset)
+				bars.exit()
+					.transition()
+					.duration(500)
+					.attr("x",w)
+					.remove();
+				});
+	
+	</script>
+	<br/>
+	<br/>
+	<footer style="color:grey">
+		<p>Bernard Joshua Raja Rajan</p>
+		<p>COS30045 Data Visualisation</p>
+		<a href="D3_Sort.html"> Go To: Lab 6.2</a>
+	</footer>
+
+</body>
+</html>
